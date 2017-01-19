@@ -300,7 +300,7 @@ public class GenericAggregateQuery implements GenericQuery {
 			super(reader,query);
 			try {
 				if(entityDef.isTimeSeries()){
-						this.start = DateTimeUtil.humanDateToDate(searchCondition.getStartTime());
+					this.start = DateTimeUtil.humanDateToDate(searchCondition.getStartTime());
 					this.end = DateTimeUtil.humanDateToDate(searchCondition.getEndTime());
 				}else{
 					start = DateTimeUtil.humanDateToDate(EntityConstants.FIXED_READ_START_HUMANTIME);
@@ -395,8 +395,10 @@ public class GenericAggregateQuery implements GenericQuery {
 		 * @throws Exception
 		 */
 		private Map<List<String>,List<double[]>> convertToTimeSeriesDataPoints(List<GroupbyKeyValue> result) throws Exception {
+
 			Map<List<String>, List<Double>> aggResultMap = this.keyValuesToMap(result);
 			Map<List<String>,List<double[]>> timeseriesDataPoints = TimeSeriesAggregator.toMetric(aggResultMap,this.pointsNum,this.aggFuncNum);
+			LOG.info("convertToTime=========1:=" + result.size() + "=======2:===" + timeseriesDataPoints.size() );
 			return timeseriesDataPoints;
 		}
 	}

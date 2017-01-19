@@ -16,6 +16,7 @@
  */
 package org.apache.eagle.storage.hbase;
 
+import org.apache.avro.generic.GenericData;
 import org.apache.eagle.log.base.taggedlog.TaggedLogAPIEntity;
 import org.apache.eagle.log.entity.GenericEntityWriter;
 import org.apache.eagle.log.entity.HBaseInternalLogHelper;
@@ -188,7 +189,7 @@ public class HBaseStorage extends DataStorageBase {
     public <E extends Object> QueryResult<E> query(CompiledQuery query, EntityDefinition entityDefinition) throws IOException {
         QueryResult<E> result = new QueryResult<E>();
         try {
-            LOG.info("Querying for query: "+query);
+            LOG.info("=====Querying for query: "+query);
             GenericQuery reader = GenericQueryBuilder
                     .select(query.getSearchCondition().getOutputFields())
                     .from(query.getServiceName(),query.getRawQuery().getMetricName()).where(query.getSearchCondition())
@@ -199,7 +200,9 @@ public class HBaseStorage extends DataStorageBase {
                     .top(query.getRawQuery().getTop())
                     .parallel(query.getRawQuery().getParallel())
                     .build();
-            List<E> entities =  reader.result();
+            List<E> entities = reader.result();
+            if (entities == null)
+                entities = new ArrayList<>();
             result.setData(entities);
             result.setFirstTimestamp(reader.getFirstTimeStamp());
             result.setLastTimestamp(reader.getLastTimestamp());
