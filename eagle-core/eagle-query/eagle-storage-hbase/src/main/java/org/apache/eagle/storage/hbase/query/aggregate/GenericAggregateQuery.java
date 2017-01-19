@@ -198,9 +198,12 @@ public class GenericAggregateQuery implements GenericQuery {
 				start, end, searchCondition.getFilter(), searchCondition.getStartRowkey(), outputQualifiers, this.prefix,this.aggregateCondition);
 		try{
 			if(LOG.isDebugEnabled()) LOG.debug("open and read group aggregate reader");
+			LOG.info("=======================1=========================");
 			reader.open();
 			List result = buildGroupAggregateQueryReader(reader,this.aggregateCondition.isTimeSeries()).result();
+			LOG.info("=======================2=========================");
 			if(result == null) throw new IOException("result is null");
+			LOG.info("=======================3=========================");
 			this.firstTimestamp = reader.getFirstTimestamp();
 			this.lastTimestamp = reader.getLastTimestamp();
 			if(LOG.isDebugEnabled()) LOG.debug("finish read aggregated " + result.size() + " rows");
@@ -236,9 +239,12 @@ public class GenericAggregateQuery implements GenericQuery {
 	 */
 	private  GroupAggregateQueryReader  buildGroupAggregateQueryReader(GenericAggregateReader reader,boolean isTimeSeries) throws IOException{
 		if(isTimeSeries){
+			LOG.info("=======================4=========================");
 			return new TimeSeriesGroupAggregateQueryReader(reader,this);
 		}else{
+			LOG.info("=======================5=========================");
 			return new FlatGroupAggregateQueryReader(reader,this);
+
 		}
 	}
 
@@ -279,10 +285,12 @@ public class GenericAggregateQuery implements GenericQuery {
 		}
 		@Override
 		public List<Map.Entry<List<String>, List<Double>>> result() throws Exception {
+			LOG.info("=======================result10=========================");
 			Map<List<String>, List<Double>> aggResultMap = this.keyValuesToMap(this.reader.read());
 			if(this.query.sortOptions == null)
 				return new ArrayList<Map.Entry<List<String>, List<Double>>>(aggResultMap.entrySet());
 			if(LOG.isDebugEnabled()) LOG.debug("Flat sorting");
+			LOG.info("=======================result12=========================");
 			return PostFlatAggregateSort.sort(aggResultMap, this.query.sortOptions, this.query.top);
 		}
 	}
@@ -340,6 +348,7 @@ public class GenericAggregateQuery implements GenericQuery {
 		public List<Map.Entry<List<String>, List<double[]>>> result() throws Exception {
 			List<GroupbyKeyValue> result = this.reader.read();
 
+			LOG.info("=======================result=========================");
 			// aggregated data points only
 			Map<List<String>,List<double[]>> timeseriesDataPoints = convertToTimeSeriesDataPoints(result);
 
@@ -382,7 +391,7 @@ public class GenericAggregateQuery implements GenericQuery {
 //			for(Map.Entry<List<String>, List<Double>> entry:flatSort){
 //				mapForSort.put(entry.getKey(),entry.getValue());
 //			}
-
+			LOG.info("=======================result2=========================");
 			// 3. Sort Time Series Result according flat aggregated keys' order
 			return TimeSeriesPostFlatAggregateSort.sort(mapForSort,timeseriesDataPoints,this.sortOptions,this.query.top);
 		}
